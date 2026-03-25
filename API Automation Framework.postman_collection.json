@@ -1,0 +1,652 @@
+{
+  "info": {
+    "_postman_id": "09f79499-83d7-46cb-ad44-6f622c4d604c",
+    "name": "API Automation Framework",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "38351236"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON', function () {",
+                  "  pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test('Token is present', function () {",
+                  "  pm.expect(json).to.have.property('accessToken');",
+                  "  pm.expect(json.accessToken).to.be.a('string').and.not.be.empty;",
+                  "});",
+                  "",
+                  "if (json && json.accessToken) {",
+                  "  pm.environment.set('accessToken', json.accessToken);",
+                  "}",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "})",
+                  "",
+                  "pm.test('Response is JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "})",
+                  "",
+                  "pm.test('Latency <= 200ms (soft)', function () {",
+                  "    const threshold = 200;",
+                  "    const rt = pm.response.responseTime;",
+                  "    if (rt > threshold) {",
+                  "        const msg = `WARN: ${ pm.info.requestName } latency ${ rt }ms > ${ threshold }ms`;",
+                  "        pm.environment.set('latencyWarning', msg);",
+                  "    }",
+                  "    pm.expect(true).to.be.true;",
+                  "})",
+                  "",
+                  "pm.test('Access token is present and is a string', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    pm.expect(jsonData).to.have.property('accessToken');",
+                  "    pm.expect(jsonData.accessToken).to.be.a('string').and.to.have.length.greaterThan(0);",
+                  "})",
+                  "",
+                  "pm.test('Optional fields: expiresIn is number, user.id is number (if present)', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (Object.prototype.hasOwnProperty.call(jsonData, 'expiresIn')) {",
+                  "        pm.expect(jsonData.expiresIn).to.be.a('number');",
+                  "    }",
+                  "    if (jsonData.user && typeof jsonData.user === 'object') {",
+                  "        if (Object.prototype.hasOwnProperty.call(jsonData.user, 'id')) {",
+                  "            pm.expect(jsonData.user.id).to.be.a('number');",
+                  "        }",
+                  "    }",
+                  "})",
+                  "",
+                  "pm.test('Set accessToken into environment (if present)', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData && typeof jsonData.accessToken === 'string' && jsonData.accessToken.length > 0) {",
+                  "        pm.environment.set('accessToken', jsonData.accessToken);",
+                  "    }",
+                  "    pm.expect(true).to.be.true;",
+                  "})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"emilys\",\"password\":\"emilyspass\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "login"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request POST '{{baseUrl}}/user/login' --header 'Content-Type: application/json' --data-raw '{\"username\":\"kminchelle\",\"password\":\"0lelplR\"}'"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response is JSON', function () {",
+                  "  pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "pm.test('User id is present', function () {",
+                  "  pm.expect(jsonData).to.have.property('id');",
+                  "  pm.expect(jsonData.id).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test(\"Response has expected structure\", function () {",
+                  "    pm.expect(jsonData).to.have.property(\"firstName\");",
+                  "    pm.expect(jsonData).to.have.property(\"lastName\");",
+                  "    pm.expect(jsonData).to.have.property(\"age\");",
+                  "    pm.expect(jsonData).to.have.property(\"email\");",
+                  "});",
+                  "",
+                  "pm.environment.set(\"userId\", pm.response.json().id);",
+                  "",
+                  "",
+                  "pm.test('Latency <= 200ms (soft)', function () {",
+                  "    const threshold = 200;",
+                  "    const rt = pm.response.responseTime;",
+                  "    if (rt > threshold) {",
+                  "        const msg = `WARN: ${ pm.info.requestName } latency ${ rt }ms > ${ threshold }ms`;",
+                  "        pm.environment.set('latencyWarning', msg);",
+                  "    }",
+                  "    pm.expect(true).to.be.true;",
+                  "})",
+                  "",
+                  "pm.test('Created user core fields have expected types', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    pm.expect(jsonData).to.have.property('firstName');",
+                  "    pm.expect(jsonData.firstName).to.be.a('string');",
+                  "    pm.expect(jsonData).to.have.property('lastName');",
+                  "    pm.expect(jsonData.lastName).to.be.a('string');",
+                  "    pm.expect(jsonData).to.have.property('age');",
+                  "    pm.expect([",
+                  "        'number',",
+                  "        'string'",
+                  "    ]).to.include(typeof jsonData.age);",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "    pm.expect(jsonData.email).to.be.a('string');",
+                  "})",
+                  "",
+                  "pm.test('Save created userId into environment (if present)', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData && typeof jsonData.id === 'number') {",
+                  "        pm.environment.set('userId', jsonData.id);",
+                  "    }",
+                  "    pm.expect(true).to.be.true;",
+                  "})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstName\":\"{{$randomFirstName}}\",\"lastName\":\"{{$randomLastName}}\",\"age\":\"{{$randomInt}}\",\"email\":\"{{$randomEmail}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "add"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request POST '{{baseUrl}}/users/add' --header 'Content-Type: application/json' --data-raw '{\"firstName\":\"John\",\"lastName\":\"Doe\",\"age\":30,\"email\":\"john.doe@example.com\"}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Login Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Token is returned\", function () {\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "    const res = pm.response.json();\r",
+                  "    pm.expect(res).to.have.property(\"accessToken\");\r",
+                  "});\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"emilys\",\"password\":\"emilyspass\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "pm.test(\"User profile has core fields with correct types\", function () {",
+                  "    const json = pm.response.json();",
+                  "",
+                  "    pm.expect(json).to.be.an(\"object\");",
+                  "",
+                  "    pm.expect(json).to.have.property(\"id\");",
+                  "    pm.expect(json.id).to.be.a(\"number\");",
+                  "",
+                  "    pm.expect(json).to.have.property(\"firstName\");",
+                  "    pm.expect(json.firstName).to.be.a(\"string\");",
+                  "",
+                  "    pm.expect(json).to.have.property(\"lastName\");",
+                  "    pm.expect(json.lastName).to.be.a(\"string\");",
+                  "",
+                  "    // DummyJSON uses a number for age",
+                  "    pm.expect(json).to.have.property(\"age\");",
+                  "    pm.expect(json.age).to.be.a(\"number\");",
+                  "",
+                  "    // email may be missing or null in some APIs; allow string/null/undefined",
+                  "    if (Object.prototype.hasOwnProperty.call(json, \"email\")) {",
+                  "        pm.expect(json.email === null || typeof json.email === \"string\").to.be.true;",
+                  "    }",
+                  "",
+                  "    pm.expect(json).to.have.property(\"username\");",
+                  "    pm.expect(json.username).to.be.a(\"string\");",
+                  "",
+                  "    // gender may exist depending on API version; if present, validate type",
+                  "    if (Object.prototype.hasOwnProperty.call(json, \"gender\")) {",
+                  "        pm.expect(json.gender).to.be.a(\"string\");",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "})",
+                  "",
+                  "pm.test('Response is JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "})",
+                  "",
+                  "pm.test('Latency <= 200ms (soft)', function () {",
+                  "    const threshold = 200;",
+                  "    const rt = pm.response.responseTime;",
+                  "    if (rt > threshold) {",
+                  "        const msg = `WARN: ${ pm.info.requestName } latency ${ rt }ms > ${ threshold }ms`;",
+                  "        pm.environment.set('latencyWarning', msg);",
+                  "    }",
+                  "    pm.expect(true).to.be.true;",
+                  "})",
+                  "",
+                  "pm.test('If environment userId is set, it is numeric', function () {",
+                  "    const envUserId = pm.environment.get('userId');",
+                  "    if (envUserId !== undefined && envUserId !== null && envUserId !== '') {",
+                  "        const n = Number(envUserId);",
+                  "        pm.expect(Number.isNaN(n)).to.eql(false);",
+                  "    }",
+                  "})",
+                  "",
+                  "pm.test('Response matches user profile schema (core fields)', function () {",
+                  "    const schema = {",
+                  "        type: 'object',",
+                  "        additionalProperties: true,",
+                  "        required: [",
+                  "            'id',",
+                  "            'firstName',",
+                  "            'lastName',",
+                  "            'age',",
+                  "            'email',",
+                  "            'phone',",
+                  "            'username'",
+                  "        ],",
+                  "        properties: {",
+                  "            id: { type: 'number' },",
+                  "            firstName: { type: 'string' },",
+                  "            lastName: { type: 'string' },",
+                  "            age: { type: 'number' },",
+                  "            email: { type: 'string' },",
+                  "            phone: { type: 'string' },",
+                  "            username: { type: 'string' },",
+                  "            address: {",
+                  "                type: 'object',",
+                  "                additionalProperties: true",
+                  "            },",
+                  "            isDeleted: { type: 'boolean' }",
+                  "        }",
+                  "    };",
+                  "    pm.response.to.have.jsonSchema(schema);",
+                  "})"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"age\":30,\"email\":\"john.doe@example.com\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "5"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request POST '{{baseUrl}}/users/add' --header 'Content-Type: application/json' --data-raw '{\"firstName\":\"John\",\"lastName\":\"Doe\",\"age\":30,\"email\":\"john.doe@example.com\"}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User (PUT id=1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "pm.test(\"Returned fields match sent values\", function () {",
+                  "    const json = pm.response.json();",
+                  "    const sent = { firstName: \"Janet\", age: 31 };",
+                  "",
+                  "    pm.expect(json).to.be.an(\"object\");",
+                  "",
+                  "    pm.expect(json).to.have.property(\"id\");",
+                  "    pm.expect(json.id).to.be.a(\"number\");",
+                  "",
+                  "    pm.expect(json).to.have.property(\"firstName\");",
+                  "    pm.expect(json.firstName).to.eql(sent.firstName);",
+                  "",
+                  "    pm.expect(json).to.have.property(\"age\");",
+                  "    pm.expect(json.age).to.eql(sent.age);",
+                  "});",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "})",
+                  "",
+                  "pm.test('Response is JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "})",
+                  "",
+                  "pm.test('Latency <= 200ms (soft)', function () {",
+                  "    const threshold = 200;",
+                  "    const rt = pm.response.responseTime;",
+                  "    if (rt > threshold) {",
+                  "        const msg = `WARN: ${ pm.info.requestName } latency ${ rt }ms > ${ threshold }ms`;",
+                  "        pm.environment.set('latencyWarning', msg);",
+                  "    }",
+                  "    pm.expect(true).to.be.true;",
+                  "})",
+                  "",
+                  "pm.test('Updated user has id and core fields with expected types', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.id).to.be.a('number');",
+                  "    if (Object.prototype.hasOwnProperty.call(jsonData, 'firstName')) {",
+                  "        pm.expect(jsonData.firstName).to.be.a('string');",
+                  "    }",
+                  "    if (Object.prototype.hasOwnProperty.call(jsonData, 'lastName')) {",
+                  "        pm.expect(jsonData.lastName).to.be.a('string');",
+                  "    }",
+                  "    if (Object.prototype.hasOwnProperty.call(jsonData, 'age')) {",
+                  "        pm.expect([",
+                  "            'number',",
+                  "            'string'",
+                  "        ]).to.include(typeof jsonData.age);",
+                  "    }",
+                  "    if (Object.prototype.hasOwnProperty.call(jsonData, 'email')) {",
+                  "        pm.expect(jsonData.email).to.be.a('string');",
+                  "    }",
+                  "})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstName\":\"Janet\",\"age\":31}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request PUT '{{baseUrl}}/users/1' --header 'Content-Type: application/json' --data-raw '{\"firstName\":\"Janet\",\"age\":31}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User (id=1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "pm.test(\"Delete response indicates deletion\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an(\"object\");",
+                  "",
+                  "    // DummyJSON delete typically returns {id, isDeleted, deletedOn}",
+                  "    if (Object.prototype.hasOwnProperty.call(json, \"isDeleted\")) {",
+                  "        pm.expect(json.isDeleted).to.eql(true);",
+                  "    }",
+                  "",
+                  "    if (Object.prototype.hasOwnProperty.call(json, \"id\")) {",
+                  "        pm.expect(json.id).to.eql(5);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "})",
+                  "",
+                  "pm.test('Response is JSON', function () {",
+                  "    pm.response.to.be.json;",
+                  "})",
+                  "",
+                  "pm.test('Latency <= 200ms (soft)', function () {",
+                  "    const threshold = 200;",
+                  "    const rt = pm.response.responseTime;",
+                  "    if (rt > threshold) {",
+                  "        const msg = `WARN: ${ pm.info.requestName } latency ${ rt }ms > ${ threshold }ms`;",
+                  "        pm.environment.set('latencyWarning', msg);",
+                  "    }",
+                  "    pm.expect(true).to.be.true;",
+                  "})",
+                  "",
+                  "pm.test('Delete response has expected shape (id present when returned)', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    if (Object.prototype.hasOwnProperty.call(jsonData, 'id')) {",
+                  "        pm.expect(jsonData.id).to.be.a('number');",
+                  "    }",
+                  "})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "5"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request DELETE '{{baseUrl}}/users/1'"
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch Invalid User (id=999999)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404 for invalid user\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "pm.test(\"Error message is present\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an(\"object\");",
+                  "",
+                  "    // DummyJSON commonly returns {message: \"User with id '... not found'\"}",
+                  "    const msg = json.message || json.error || json.msg;",
+                  "    pm.expect(msg, \"Expected an error message field (message/error/msg)\").to.exist;",
+                  "    pm.expect(String(msg).length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "999999"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request GET '{{baseUrl}}/users/999999'"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": []
+    }
+  ]
+}
