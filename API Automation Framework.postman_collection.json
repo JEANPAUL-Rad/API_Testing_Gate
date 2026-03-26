@@ -44,15 +44,9 @@
                   "    }",
                   "});",
                   "",
-                  "pm.test(\"Latency <= 200ms (soft)\", function () {",
-                  "    const threshold = 200;",
-                  "    const rt = pm.response.responseTime;",
-                  "    if (rt > threshold) {",
-                  "        pm.environment.set(\"latencyWarning\", `WARN: ${pm.info.requestName} latency ${rt}ms > ${threshold}ms`);",
-                  "    }",
-                  "    pm.expect(true).to.be.true;",
-                  "});",
-                  ""
+                  "pm.test(\"Response time is within 200ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -70,7 +64,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"username\":\"emilys\",\"password\":\"emilyspass\"}",
+              "raw": "{\"username\":\"{{username}}\",\"password\":\"{{password}}\"}\r\n\r\n//{\"username\":\"emilys\",\"password\":\"emilyspass\"}\r\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -134,15 +128,9 @@
                   "    pm.environment.set(\"userId\", jsonData.id);",
                   "}",
                   "",
-                  "pm.test(\"Latency <= 200ms (soft)\", function () {",
-                  "    const threshold = 200;",
-                  "    const rt = pm.response.responseTime;",
-                  "    if (rt > threshold) {",
-                  "        pm.environment.set(\"latencyWarning\", `WARN: ${pm.info.requestName} latency ${rt}ms > ${threshold}ms`);",
-                  "    }",
-                  "    pm.expect(true).to.be.true; ",
-                  "});",
-                  ""
+                  "pm.test(\"Response time is within 200ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(200);",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -178,54 +166,6 @@
               ]
             },
             "description": "Generated from cURL: curl --location --request POST '{{baseUrl}}/users/add' --header 'Content-Type: application/json' --data-raw '{\"firstName\":\"John\",\"lastName\":\"Doe\",\"age\":30,\"email\":\"john.doe@example.com\"}'"
-          },
-          "response": []
-        },
-        {
-          "name": "Login Request",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Token is returned\", function () {\r",
-                  "pm.test(\"Status code is 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "    const res = pm.response.json();\r",
-                  "    pm.expect(res).to.have.property(\"accessToken\");\r",
-                  "});\r",
-                  "\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "// {\"username\":\"emilys\",\"password\":\"emilyspass\"}\r\n\r\n{\"username\":\"{{username}}\",\"password\":\"{{password}}\"}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "login"
-              ]
-            }
           },
           "response": []
         },
@@ -273,14 +213,10 @@
                   "    }",
                   "});",
                   "",
-                  "pm.test(\"Latency <= 200ms (soft)\", function () {",
-                  "    const threshold = 200;",
-                  "    const rt = pm.response.responseTime;",
-                  "    if (rt > threshold) {",
-                  "        pm.environment.set(\"latencyWarning\", `WARN: ${pm.info.requestName} latency ${rt}ms > ${threshold}ms`);",
-                  "    }",
-                  "    pm.expect(true).to.be.true;",
+                  "pm.test(\"Response time is within 200ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(200);",
                   "});",
+                  "",
                   "pm.test(\"Environment userId is numeric if set\", function () {",
                   "    const envUserId = pm.environment.get(\"userId\");",
                   "    if (envUserId) {",
@@ -289,25 +225,24 @@
                   "});",
                   "",
                   "pm.test(\"Response matches user profile schema\", function () {",
-                  "    const schema = {",
-                  "        type: \"object\",",
-                  "        additionalProperties: true,",
-                  "        required: [\"id\", \"firstName\", \"lastName\", \"age\", \"email\", \"phone\", \"username\"],",
-                  "        properties: {",
-                  "            id: { type: \"number\" },",
-                  "            firstName: { type: \"string\" },",
-                  "            lastName: { type: \"string\" },",
-                  "            age: { type: \"number\" },",
-                  "            email: { type: \"string\" },",
-                  "            phone: { type: \"string\" },",
-                  "            username: { type: \"string\" },",
-                  "            address: { type: \"object\", additionalProperties: true },",
-                  "            isDeleted: { type: \"boolean\" }",
-                  "        }",
-                  "    };",
+                  "   const schema = {",
+                  "    type: \"object\",",
+                  "    additionalProperties: true,",
+                  "    required: [\"id\", \"firstName\", \"lastName\", \"age\", \"email\", \"phone\", \"username\"],",
+                  "    properties: {",
+                  "        id: { type: \"number\" },",
+                  "        firstName: { type: \"string\" },",
+                  "        lastName: { type: \"string\" },",
+                  "        age: { type: \"number\" },",
+                  "        email: { type: \"string\" },",
+                  "        phone: { type: \"string\" },",
+                  "        username: { type: \"string\" },",
+                  "        address: { type: \"object\", additionalProperties: true },",
+                  "        isDeleted: { type: \"boolean\" }",
+                  "    }",
+                  "};",
                   "    pm.response.to.have.jsonSchema(schema);",
-                  "});",
-                  ""
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -399,13 +334,8 @@
                   "    }",
                   "});",
                   "",
-                  "pm.test(\"Latency <= 200ms (soft)\", function () {",
-                  "    const threshold = 200;",
-                  "    const rt = pm.response.responseTime;",
-                  "    if (rt > threshold) {",
-                  "        pm.environment.set(\"latencyWarning\", `WARN: ${pm.info.requestName} latency ${rt}ms > ${threshold}ms`);",
-                  "    }",
-                  "    pm.expect(true).to.be.true;",
+                  "pm.test(\"Response time is within 200ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(200);",
                   "});",
                   ""
                 ],
@@ -474,16 +404,9 @@
                   "    }",
                   "});",
                   "",
-                  "pm.test(\"Latency <= 200ms (soft)\", function () {",
-                  "    const threshold = 200;",
-                  "    const rt = pm.response.responseTime;",
-                  "    if (rt > threshold) {",
-                  "        pm.environment.set(\"latencyWarning\", `WARN: ${pm.info.requestName} latency ${rt}ms > ${threshold}ms`);      ",
-                  "    }",
-                  "    pm.expect(true).to.be.true;",
-                  "    ",
+                  "pm.test(\"Response time is within 200ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.at.most(200);",
                   "});",
-                  "console.log(\"{{latencyWarning}}\");",
                   ""
                 ],
                 "type": "text/javascript",
