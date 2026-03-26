@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "09f79499-83d7-46cb-ad44-6f622c4d604c",
+    "_postman_id": "d6290367-a01b-4e42-86e1-4ec61332349e",
     "name": "API Automation Framework",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "38351236"
@@ -209,13 +209,12 @@
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/json",
-                "disabled": false
+                "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"username\":\"emilys\",\"password\":\"emilyspass\"}"
+              "raw": "// {\"username\":\"emilys\",\"password\":\"emilyspass\"}\r\n\r\n{\"username\":\"{{username}}\",\"password\":\"{{password}}\"}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
@@ -479,10 +478,479 @@
                   "    const threshold = 200;",
                   "    const rt = pm.response.responseTime;",
                   "    if (rt > threshold) {",
+                  "        pm.environment.set(\"latencyWarning\", `WARN: ${pm.info.requestName} latency ${rt}ms > ${threshold}ms`);      ",
+                  "    }",
+                  "    pm.expect(true).to.be.true;",
+                  "    ",
+                  "});",
+                  "console.log(\"{{latencyWarning}}\");",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "5"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request DELETE '{{baseUrl}}/users/1'"
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch Invalid User (id=999999)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404 for invalid user\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test(\"Error message is present\", function () {",
+                  "    pm.expect(json).to.be.an(\"object\");",
+                  "",
+                  "    const msg = json.message || json.error || json.msg;",
+                  "    pm.expect(msg, \"Expected an error message field (message/error/msg)\").to.exist;",
+                  "    pm.expect(String(msg).length).to.be.above(0);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "999999"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request GET '{{baseUrl}}/users/999999'"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Management parameterisation",
+      "item": [
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"User response has required fields with correct types\", function () {",
+                  "    pm.expect(jsonData).to.have.property(\"id\");",
+                  "    pm.expect(jsonData.id).to.be.a(\"number\");",
+                  "",
+                  "    pm.expect(jsonData).to.have.property(\"firstName\");",
+                  "    pm.expect(jsonData.firstName).to.be.a(\"string\");",
+                  "",
+                  "    pm.expect(jsonData).to.have.property(\"lastName\");",
+                  "    pm.expect(jsonData.lastName).to.be.a(\"string\");",
+                  "",
+                  "    pm.expect(jsonData).to.have.property(\"age\");",
+                  "    pm.expect([\"number\", \"string\"]).to.include(typeof jsonData.age);",
+                  "",
+                  "    pm.expect(jsonData).to.have.property(\"email\");",
+                  "    pm.expect(jsonData.email).to.be.a(\"string\");",
+                  "});",
+                  "",
+                  "if (typeof jsonData.id === \"number\") {",
+                  "    pm.environment.set(\"userId\", jsonData.id);",
+                  "}",
+                  "",
+                  "pm.test(\"Latency <= 200ms (soft)\", function () {",
+                  "    const threshold = 200;",
+                  "    const rt = pm.response.responseTime;",
+                  "    if (rt > threshold) {",
+                  "        pm.environment.set(\"latencyWarning\", `WARN: ${pm.info.requestName} latency ${rt}ms > ${threshold}ms`);",
+                  "    }",
+                  "    pm.expect(true).to.be.true; ",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstName\":\"{{$randomFirstName}}\",\"lastName\":\"{{$randomLastName}}\",\"age\":\"{{$randomInt}}\",\"email\":\"{{$randomEmail}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "add"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request POST '{{baseUrl}}/users/add' --header 'Content-Type: application/json' --data-raw '{\"firstName\":\"John\",\"lastName\":\"Doe\",\"age\":30,\"email\":\"john.doe@example.com\"}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Login Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Token is returned\", function () {\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "    const res = pm.response.json();\r",
+                  "    pm.expect(res).to.have.property(\"accessToken\");\r",
+                  "});\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "// {\"username\":\"emilys\",\"password\":\"emilyspass\"}\r\n\r\n{\"username\":\"{{username}}\",\"password\":\"{{password}}\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test(\"User profile has required fields with correct types\", function () {",
+                  "    pm.expect(json).to.be.an(\"object\");",
+                  "",
+                  "    pm.expect(json).to.have.property(\"id\");",
+                  "    pm.expect(json.id).to.be.a(\"number\");",
+                  "",
+                  "    pm.expect(json).to.have.property(\"firstName\");",
+                  "    pm.expect(json.firstName).to.be.a(\"string\");",
+                  "",
+                  "    pm.expect(json).to.have.property(\"lastName\");",
+                  "    pm.expect(json.lastName).to.be.a(\"string\");",
+                  "",
+                  "    pm.expect(json).to.have.property(\"age\");",
+                  "    pm.expect(json.age).to.be.a(\"number\");",
+                  "",
+                  "    if (json.email !== undefined) {",
+                  "        pm.expect(json.email === null || typeof json.email === \"string\").to.be.true;",
+                  "    }",
+                  "",
+                  "    pm.expect(json).to.have.property(\"username\");",
+                  "    pm.expect(json.username).to.be.a(\"string\");",
+                  "",
+                  "    if (json.gender !== undefined) {",
+                  "        pm.expect(json.gender).to.be.a(\"string\");",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"Latency <= 200ms (soft)\", function () {",
+                  "    const threshold = 200;",
+                  "    const rt = pm.response.responseTime;",
+                  "    if (rt > threshold) {",
                   "        pm.environment.set(\"latencyWarning\", `WARN: ${pm.info.requestName} latency ${rt}ms > ${threshold}ms`);",
                   "    }",
                   "    pm.expect(true).to.be.true;",
                   "});",
+                  "pm.test(\"Environment userId is numeric if set\", function () {",
+                  "    const envUserId = pm.environment.get(\"userId\");",
+                  "    if (envUserId) {",
+                  "        pm.expect(Number.isNaN(Number(envUserId))).to.eql(false);",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"Response matches user profile schema\", function () {",
+                  "    const schema = {",
+                  "        type: \"object\",",
+                  "        additionalProperties: true,",
+                  "        required: [\"id\", \"firstName\", \"lastName\", \"age\", \"email\", \"phone\", \"username\"],",
+                  "        properties: {",
+                  "            id: { type: \"number\" },",
+                  "            firstName: { type: \"string\" },",
+                  "            lastName: { type: \"string\" },",
+                  "            age: { type: \"number\" },",
+                  "            email: { type: \"string\" },",
+                  "            phone: { type: \"string\" },",
+                  "            username: { type: \"string\" },",
+                  "            address: { type: \"object\", additionalProperties: true },",
+                  "            isDeleted: { type: \"boolean\" }",
+                  "        }",
+                  "    };",
+                  "    pm.response.to.have.jsonSchema(schema);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"age\":30,\"email\":\"john.doe@example.com\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "5"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request POST '{{baseUrl}}/users/add' --header 'Content-Type: application/json' --data-raw '{\"firstName\":\"John\",\"lastName\":\"Doe\",\"age\":30,\"email\":\"john.doe@example.com\"}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User (PUT id=1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test(\"Returned fields match sent values\", function () {",
+                  "    const sent = { firstName: \"Janet\", age: 31 };",
+                  "",
+                  "    pm.expect(json).to.be.an(\"object\");",
+                  "    pm.expect(json).to.have.property(\"id\");",
+                  "    pm.expect(json.id).to.be.a(\"number\");",
+                  "",
+                  "    pm.expect(json).to.have.property(\"firstName\");",
+                  "    pm.expect(json.firstName).to.eql(sent.firstName);",
+                  "",
+                  "    pm.expect(json).to.have.property(\"age\");",
+                  "    pm.expect(json.age).to.eql(sent.age);",
+                  "});",
+                  "",
+                  "pm.test(\"Updated user has id and core fields with expected types\", function () {",
+                  "    pm.expect(json).to.be.an(\"object\");",
+                  "    pm.expect(json).to.have.property(\"id\");",
+                  "    pm.expect(json.id).to.be.a(\"number\");",
+                  "",
+                  "    if (json.firstName !== undefined) {",
+                  "        pm.expect(json.firstName).to.be.a(\"string\");",
+                  "    }",
+                  "    if (json.lastName !== undefined) {",
+                  "        pm.expect(json.lastName).to.be.a(\"string\");",
+                  "    }",
+                  "    if (json.age !== undefined) {",
+                  "        pm.expect([\"number\", \"string\"]).to.include(typeof json.age);",
+                  "    }",
+                  "    if (json.email !== undefined) {",
+                  "        pm.expect(json.email).to.be.a(\"string\");",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"Latency <= 200ms (soft)\", function () {",
+                  "    const threshold = 200;",
+                  "    const rt = pm.response.responseTime;",
+                  "    if (rt > threshold) {",
+                  "        pm.environment.set(\"latencyWarning\", `WARN: ${pm.info.requestName} latency ${rt}ms > ${threshold}ms`);",
+                  "    }",
+                  "    pm.expect(true).to.be.true;",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstName\":\"Janet\",\"age\":31}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "1"
+              ]
+            },
+            "description": "Generated from cURL: curl --location --request PUT '{{baseUrl}}/users/1' --header 'Content-Type: application/json' --data-raw '{\"firstName\":\"Janet\",\"age\":31}'"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User (id=1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "",
+                  "pm.test(\"Delete response indicates deletion\", function () {",
+                  "    pm.expect(json).to.be.an(\"object\");",
+                  "",
+                  "    if (json.isDeleted !== undefined) {",
+                  "        pm.expect(json.isDeleted).to.eql(true);",
+                  "    }",
+                  "    if (json.id !== undefined) {",
+                  "        pm.expect(json.id).to.be.a(\"number\");",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"Latency <= 200ms (soft)\", function () {",
+                  "    const threshold = 200;",
+                  "    const rt = pm.response.responseTime;",
+                  "    if (rt > threshold) {",
+                  "        pm.environment.set(\"latencyWarning\", `WARN: ${pm.info.requestName} latency ${rt}ms > ${threshold}ms`);      ",
+                  "    }",
+                  "    pm.expect(true).to.be.true;",
+                  "    ",
+                  "});",
+                  "console.log(\"{{latencyWarning}}\");",
                   ""
                 ],
                 "type": "text/javascript",
@@ -561,7 +1029,8 @@
     },
     {
       "name": "Reports",
-      "item": []
+      "item": [],
+      "description": "# API Automation Framework — Test Report\n\n## Overview\n\nThis report documents all API endpoints tested within the **API Automation Framework** collection. The collection is organized into two functional modules: **Auth** and **User Management**. All requests target the `{{baseUrl}}` environment variable.\n\n---\n\n## 1\\. Auth Module\n\n### POST `/user/login` — Login\n\n| Field | Details |\n| --- | --- |\n| Method | POST |\n| URL | `{{baseUrl}}/user/login` |\n| Auth | None (public endpoint) |\n| Content-Type | `application/json` |\n\n**Request Body:**\n\n``` json\n{\n  \"username\": \"kminchelle\",\n  \"password\": \"0lelplR\"\n}\n\n ```\n\n**Purpose:** Authenticates a user and returns an access token used for subsequent authorized requests.\n\n**Expected Outcome:** `200 OK` with a JWT token in the response body.\n\n---\n\n### POST `/auth/login` — Login Request\n\n| Field | Details |\n| --- | --- |\n| Method | POST |\n| URL | `{{baseUrl}}/auth/login` |\n| Auth | None (public endpoint) |\n| Content-Type | `application/json` |\n\n**Purpose:** Alternative authentication endpoint. Returns an access token upon successful login.\n\n**Expected Outcome:** `200 OK` with authentication credentials.\n\n---\n\n## 2\\. User Management Module\n\n### POST `/users/add` — Create User\n\n| Field | Details |\n| --- | --- |\n| Method | POST |\n| URL | `{{baseUrl}}/users/add` |\n| Auth | Bearer Token (`{{accessToken}}`) |\n| Content-Type | `application/json` |\n\n**Request Body:**\n\n``` json\n{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"age\": 30,\n  \"email\": \"john.doe@example.com\"\n}\n\n ```\n\n**Purpose:** Creates a new user record in the system.\n\n**Expected Outcome:** `201 Created` with the newly created user object including an assigned `id`.\n\n---\n\n### GET `/users/5` — GET User\n\n| Field | Details |\n| --- | --- |\n| Method | GET |\n| URL | `{{baseUrl}}/users/5` |\n| Auth | Bearer Token (`{{accessToken}}`) |\n\n**Purpose:** Retrieves the details of a specific user by their ID (id=5).\n\n**Expected Outcome:** `200 OK` with the user object containing `id`, `firstName`, `lastName`, `age`, and `email`.\n\n---\n\n### PUT `/users/1` — Update User (PUT id=1)\n\n| Field | Details |\n| --- | --- |\n| Method | PUT |\n| URL | `{{baseUrl}}/users/1` |\n| Auth | Bearer Token (`{{accessToken}}`) |\n| Content-Type | `application/json` |\n\n**Request Body:**\n\n``` json\n{\n  \"firstName\": \"Janet\",\n  \"age\": 31\n}\n\n ```\n\n**Purpose:** Updates specific fields of an existing user (id=1).\n\n**Expected Outcome:** `200 OK` with the updated user object reflecting the new values.\n\n---\n\n### DELETE `/users/5` — Delete User (id=1)\n\n| Field | Details |\n| --- | --- |\n| Method | DELETE |\n| URL | `{{baseUrl}}/users/5` |\n| Auth | Bearer Token (`{{accessToken}}`) |\n\n**Purpose:** Deletes a user record from the system by ID.\n\n**Expected Outcome:** `200 OK` with a confirmation that the user has been deleted.\n\n---\n\n### GET `/users/999999` — Fetch Invalid User (id=999999)\n\n| Field | Details |\n| --- | --- |\n| Method | GET |\n| URL | `{{baseUrl}}/users/999999` |\n| Auth | Bearer Token (`{{accessToken}}`) |\n\n**Purpose:** Negative test case — attempts to fetch a user with a non-existent ID to validate proper error handling.\n\n**Expected Outcome:** `404 Not Found` with an appropriate error message.\n\n---\n\n## 3\\. Environment Variables\n\n| Variable | Description |\n| --- | --- |\n| `{{baseUrl}}` | Base URL of the API under test |\n| `{{accessToken}}` | JWT token obtained after successful login |\n| `{{userId}}` | Dynamic user ID set during test execution |\n| `{{latencyWarning}}` | Threshold (ms) for response time assertions |\n\n---\n\n## 4\\. Test Coverage Summary\n\n| Endpoint | Method | Test Type | Status |\n| --- | --- | --- | --- |\n| `/user/login` | POST | Auth / Positive | ✅ |\n| `/auth/login` | POST | Auth / Positive | ✅ |\n| `/users/add` | POST | CRUD / Positive | ✅ |\n| `/users/5` | GET | CRUD / Positive | ✅ |\n| `/users/1` | PUT | CRUD / Positive | ✅ |\n| `/users/5` | DELETE | CRUD / Positive | ✅ |\n| `/users/999999` | GET | Negative / Error | ✅ |\n\n---\n\n## 5\\. Notes\n\n- All requests use `{{baseUrl}}` which is configured in the **Assessment - Env** environment.\n    \n- The `{{accessToken}}` variable should be set automatically via a post-response script on the Login request.\n    \n- The **Reports** folder serves as the documentation and reporting hub for this collection.\n    \n- Generated: 2026-03-26"
     }
   ]
 }
